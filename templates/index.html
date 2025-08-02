@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubik's Cube Solver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            touch-action: none;
+        }
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .solution-text {
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body class="bg-[#fffdf3] text-gray-800 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <header class="absolute top-0 left-0 w-full p-4 flex justify-end items-center">
+        <p class="text-xl font-medium mr-6">Made by Suhas NY</p>
+        <a href="https://github.com/SuhasNY/cube-solver" class="btn flex items-center gap-2 bg-white font-semibold text-black hover:text-indigo-500 transition-colors py-2 px-4 rounded-lg shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span>GitHub Repo</span>
+        </a>
+    </header>
+
+    <div class="w-full max-w-5xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-8">
+
+        <!-- Left Panel: Cube and Controls -->
+        <div class="w-full lg:w-1/2 flex flex-col items-center">
+            <h1 class="text-4xl font-bold mb-4 text-indigo-600">Rubik's Cube Solver</h1>
+            
+            <div id="canvas-container" class="w-full max-w-sm h-64 sm:h-80 md:h-96 rounded-lg mb-4"></div>
+
+            <div class="grid grid-cols-3 gap-2 w-full max-w-xs mb-6">
+                <div></div>
+                <button id="rotate-up" class="btn bg-white hover:bg-indigo-500 hover:text-white text-gray-600 p-3 rounded-lg shadow-md flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>
+                </button>
+                <div></div>
+                <button id="rotate-left" class="btn bg-white hover:bg-indigo-500 hover:text-white text-gray-600 p-3 rounded-lg shadow-md flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 15l-6-6m0 0l6-6m-6 6h12a6 6 0 016 6v3" />
+                    </svg>
+                </button>
+                 <button id="reset-view" class="btn bg-white hover:bg-red-500 hover:text-white text-gray-600 p-3 rounded-lg shadow-md flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 9a9 9 0 0114.65-4.65L20 5M20 15a9 9 0 01-14.65 4.65L4 19" /></svg>
+                </button>
+                <button id="rotate-right" class="btn bg-white hover:bg-indigo-500 hover:text-white text-gray-600 p-3 rounded-lg shadow-md flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 00-6 6v3" />
+                    </svg>
+                </button>
+                <div></div>
+                <button id="rotate-down" class="btn bg-white hover:bg-indigo-500 hover:text-white text-gray-600 p-3 rounded-lg shadow-md flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                <div></div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Scramble and Solution -->
+        <div class="w-full lg:w-1/2 bg-white p-6 rounded-xl shadow-lg text-gray-800">
+            <h2 class="text-2xl font-semibold mb-4 text-indigo-600">Controls</h2>
+            
+            <div class="mb-4">
+                <label for="scramble-input" class="block mb-2 text-sm font-medium text-gray-600">Enter Scramble Algorithm</label>
+                <div class="flex gap-2">
+                    <input type="text" id="scramble-input" class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" placeholder="e.g., F U R' D2">
+                    <button id="scramble-btn" class="btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg">Scramble!</button>
+                </div>
+                 <button id="random-scramble-btn" class="btn mt-2 text-sm text-indigo-600 hover:text-indigo-500">Generate Random Scramble</button>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="text-sm font-medium text-gray-500">Scramble Applied:</h3>
+                <p id="cumulative-scramble-display" class="text-gray-700 text-sm bg-gray-100 p-2 rounded-md min-h-[36px] break-words"></p>
+            </div>
+            
+            <div class="mb-4">
+                 <button id="solve-btn" class="btn w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z" />
+                    </svg>
+                    Solve Cube
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">Solution:</h3>
+                <div id="solution-output" class="bg-gray-100 p-4 rounded-lg min-h-[80px] flex items-center justify-center">
+                    <p id="solution-text" class="text-gray-500 solution-text">Enter a scramble and click solve.</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button id="play-solution-btn" class="btn w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>
+                    Play Solution
+                </button>
+                <button id="reset-cube-btn" class="btn w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Reset Cube</button>
+            </div>
+             <div id="status-message" class="mt-4 text-center text-red-500 h-5"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Basic Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setClearColor(0x000000, 0);
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const CUBE_SIZE = 3;
+        const CUBIE_SIZE = 1;
+        const CUBIE_SPACING = 0.02;
+        const totalCubieSize = CUBIE_SIZE + CUBIE_SPACING;
+        const cubeGroup = new THREE.Group();
+        scene.add(cubeGroup);
+
+        const colors = {
+            'U': 0xffffff, 'D': 0xfff73f, 'F': 0x237546,
+            'B': 0x3936C7, 'R': 0xd70000, 'L': 0xff7410, 'inside': 0x000000
+        };
+        const materials = Object.fromEntries(Object.entries(colors).map(([key, val]) => [key, new THREE.MeshStandardMaterial({ color: val, roughness: 0.5, metalness: 0 })]));
+
+        const cubies = [];
+        const offset = (CUBE_SIZE - 1) / 2;
+        const stickerSize = CUBIE_SIZE * 0.85;
+        const stickerThickness = 0.01;
+
+        function createRoundedRectShape(width, height, radius) {
+            const shape = new THREE.Shape();
+            const x = -width / 2, y = -height / 2;
+            shape.moveTo(x, y + radius);
+            shape.lineTo(x, y + height - radius);
+            shape.quadraticCurveTo(x, y + height, x + radius, y + height);
+            shape.lineTo(x + width - radius, y + height);
+            shape.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+            shape.lineTo(x + width, y + radius);
+            shape.quadraticCurveTo(x + width, y, x + width - radius, y);
+            shape.lineTo(x + radius, y);
+            shape.quadraticCurveTo(x, y, x, y + radius);
+            return shape;
+        }
+
+        const stickerShape = createRoundedRectShape(stickerSize, stickerSize, 0.1);
+        const stickerGeometry = new THREE.ShapeGeometry(stickerShape);
+
+        for (let x = 0; x < CUBE_SIZE; x++) for (let y = 0; y < CUBE_SIZE; y++) for (let z = 0; z < CUBE_SIZE; z++) {
+            if (x === 1 && y === 1 && z === 1) continue;
+
+            const cubieGroup = new THREE.Group();
+            
+            const bodyGeometry = new THREE.BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE);
+            const body = new THREE.Mesh(bodyGeometry, materials['inside']);
+            cubieGroup.add(body);
+
+            const half = CUBIE_SIZE / 2;
+            const stickerPositions = [
+                { face: 'R', material: materials.R, position: [half + stickerThickness, 0, 0], rotation: [0, Math.PI / 2, 0] },
+                { face: 'L', material: materials.L, position: [-half - stickerThickness, 0, 0], rotation: [0, -Math.PI / 2, 0] },
+                { face: 'U', material: materials.U, position: [0, half + stickerThickness, 0], rotation: [-Math.PI / 2, 0, 0] },
+                { face: 'D', material: materials.D, position: [0, -half - stickerThickness, 0], rotation: [Math.PI / 2, 0, 0] },
+                { face: 'F', material: materials.F, position: [0, 0, half + stickerThickness], rotation: [0, 0, 0] },
+                { face: 'B', material: materials.B, position: [0, 0, -half - stickerThickness], rotation: [0, Math.PI, 0] },
+            ];
+            
+            const isFaceVisible = { R: x === 2, L: x === 0, U: y === 2, D: y === 0, F: z === 2, B: z === 0 };
+
+            stickerPositions.forEach(sp => {
+                if (isFaceVisible[sp.face]) {
+                    const sticker = new THREE.Mesh(stickerGeometry, sp.material);
+                    sticker.position.set(...sp.position);
+                    sticker.rotation.set(...sp.rotation);
+                    cubieGroup.add(sticker);
+                }
+            });
+            
+            cubieGroup.position.set((x - offset) * totalCubieSize, (y - offset) * totalCubieSize, (z - offset) * totalCubieSize);
+            cubieGroup.userData = { originalPosition: cubieGroup.position.clone(), originalQuaternion: cubieGroup.quaternion.clone() };
+            cubeGroup.add(cubieGroup);
+            cubies.push(cubieGroup);
+        }
+        
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        mainLight.position.set(-10, 15, 12);
+        scene.add(mainLight);
+        const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
+        fillLight.position.set(10, 5, 12);
+        scene.add(fillLight);
+
+        camera.position.z = 8;
+        
+        const setInitialView = () => {
+            cubeGroup.rotation.x = Math.PI / 7.7;
+            cubeGroup.rotation.y = -Math.PI / 4.5;
+            cubeGroup.rotation.z = 0;
+        };
+        setInitialView();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        // --- State and Animation Logic ---
+        let appState = 'idle';
+        let cumulativeScramble = "";
+        let scrambledState = [];
+
+        const allButtons = document.querySelectorAll('.btn');
+        const viewRotationButtons = document.querySelectorAll('#rotate-up, #rotate-down, #rotate-left, #rotate-right, #reset-view');
+
+        function updateButtonStates(state) {
+            appState = state;
+            allButtons.forEach(btn => btn.disabled = false);
+
+            if (['scrambling', 'solving', 'playing'].includes(state)) {
+                allButtons.forEach(btn => {
+                    if (!Array.from(viewRotationButtons).includes(btn)) {
+                        btn.disabled = true;
+                    }
+                });
+                if (state !== 'scrambling') resetCubeBtn.disabled = false;
+            } else if (state === 'solved') {
+                scrambleBtn.disabled = true;
+                randomScrambleBtn.disabled = true;
+                solveBtn.disabled = true;
+            } else if (state === 'scrambled') {
+                playSolutionBtn.disabled = true;
+            } else if (state === 'idle') {
+                solveBtn.disabled = true;
+                playSolutionBtn.disabled = true;
+            }
+        }
+
+        function getPivotAndCubies(axis, slice) {
+            const pivot = new THREE.Object3D();
+            const sliceCubies = [];
+            const threshold = totalCubieSize / 2;
+            cubies.forEach(cubie => {
+                if (Math.abs(cubie.position[axis] - slice * totalCubieSize) < threshold) {
+                    sliceCubies.push(cubie);
+                }
+            });
+            sliceCubies.forEach(cubie => pivot.add(cubie));
+            cubeGroup.add(pivot);
+            return { pivot, sliceCubies };
+        }
+
+        function animateMove(axis, slice, angle, duration = 0.3) {
+            return new Promise(resolve => {
+                const { pivot, sliceCubies } = getPivotAndCubies(axis, slice);
+                gsap.to(pivot.rotation, {
+                    [axis]: pivot.rotation[axis] + angle,
+                    duration: duration,
+                    ease: "power2.inOut",
+                    onComplete: () => {
+                        cubeGroup.remove(pivot);
+                        sliceCubies.forEach(cubie => {
+                            const worldPosition = new THREE.Vector3();
+                            cubie.getWorldPosition(worldPosition);
+                            const worldQuaternion = new THREE.Quaternion();
+                            cubie.getWorldQuaternion(worldQuaternion);
+                            cubeGroup.add(cubie);
+                            cubie.position.copy(worldPosition);
+                            cubie.quaternion.copy(worldQuaternion);
+                        });
+                        resolve();
+                    }
+                });
+            });
+        }
+        
+        const moves = {
+            "F":  () => animateMove('z', 1, -Math.PI / 2),
+            "F'": () => animateMove('z', 1, Math.PI / 2),
+            "F2": () => animateMove('z', 1, -Math.PI, 0.6),
+            "B":  () => animateMove('z', -1, Math.PI / 2),
+            "B'": () => animateMove('z', -1, -Math.PI / 2),
+            "B2": () => animateMove('z', -1, Math.PI, 0.6),
+            "U":  () => animateMove('y', 1, -Math.PI / 2),
+            "U'": () => animateMove('y', 1, Math.PI / 2),
+            "U2": () => animateMove('y', 1, -Math.PI, 0.6),
+            "D":  () => animateMove('y', -1, Math.PI / 2),
+            "D'": () => animateMove('y', -1, -Math.PI / 2),
+            "D2": () => animateMove('y', -1, Math.PI, 0.6),
+            "R":  () => animateMove('x', 1, -Math.PI / 2),
+            "R'": () => animateMove('x', 1, Math.PI / 2),
+            "R2": () => animateMove('x', 1, -Math.PI, 0.6),
+            "L":  () => animateMove('x', -1, Math.PI / 2),
+            "L'": () => animateMove('x', -1, -Math.PI / 2),
+            "L2": () => animateMove('x', -1, Math.PI, 0.6),
+        };
+
+        async function executeSequence(sequence) {
+            const moveList = sequence.trim().replace(/,\s*$/, "").split(/[\s,]+/);
+            for (const move of moveList) {
+                const normalizedMove = move.replace(/'2/g, '2');
+                if (moves[normalizedMove]) {
+                    await moves[normalizedMove]();
+                }
+            }
+        }
+
+        function validateScramble(scrambleString) {
+            if (!scrambleString.trim()) return true;
+            const validMoveRegex = /^[UDRLFB]('?2|'|2)?$/i; // Case-insensitive
+            const moves = scrambleString.trim().split(/\s+/);
+            return moves.every(move => validMoveRegex.test(move));
+        }
+
+        function saveScrambledState() {
+            scrambledState = cubies.map(cubie => ({
+                position: cubie.position.clone(),
+                quaternion: cubie.quaternion.clone()
+            }));
+        }
+
+        function restoreScrambledState() {
+            if (scrambledState.length === 0) return;
+            cubies.forEach((cubie, index) => {
+                cubie.position.copy(scrambledState[index].position);
+                cubie.quaternion.copy(scrambledState[index].quaternion);
+            });
+        }
+        
+        const scrambleInput = document.getElementById('scramble-input');
+        const scrambleBtn = document.getElementById('scramble-btn');
+        const randomScrambleBtn = document.getElementById('random-scramble-btn');
+        const solveBtn = document.getElementById('solve-btn');
+        const solutionText = document.getElementById('solution-text');
+        const playSolutionBtn = document.getElementById('play-solution-btn');
+        const resetCubeBtn = document.getElementById('reset-cube-btn');
+        const statusMessage = document.getElementById('status-message');
+        const cumulativeScrambleDisplay = document.getElementById('cumulative-scramble-display');
+        
+        document.getElementById('rotate-left').addEventListener('click', () => gsap.to(cubeGroup.rotation, { y: cubeGroup.rotation.y - Math.PI / 2, duration: 0.5 }));
+        document.getElementById('rotate-right').addEventListener('click', () => gsap.to(cubeGroup.rotation, { y: cubeGroup.rotation.y + Math.PI / 2, duration: 0.5 }));
+        document.getElementById('rotate-up').addEventListener('click', () => gsap.to(cubeGroup.rotation, { x: cubeGroup.rotation.x - Math.PI / 4, duration: 0.5 }));
+        document.getElementById('rotate-down').addEventListener('click', () => gsap.to(cubeGroup.rotation, { x: cubeGroup.rotation.x + Math.PI / 4, duration: 0.5 }));
+        document.getElementById('reset-view').addEventListener('click', () => gsap.to(cubeGroup.rotation, { x: Math.PI / 7.7, y: -Math.PI / 4.5, z: 0, duration: 0.2 }));
+
+        scrambleBtn.addEventListener('click', async () => {
+            if (appState !== 'idle' && appState !== 'scrambled') return;
+            const newMoves = scrambleInput.value.trim().toUpperCase();
+            if (!validateScramble(newMoves)) {
+                // MODIFIED: Display error message in bold.
+                statusMessage.innerHTML = "<strong>Invalid move found! Only use F, U, R, L, D, B with ' or 2.</strong>";
+                setTimeout(() => { if (statusMessage.innerHTML.includes("Invalid move")) statusMessage.innerHTML = ""; }, 3000);
+                return;
+            }
+            statusMessage.innerHTML = "";
+            if (!newMoves) return;
+            
+            updateButtonStates('scrambling');
+            cumulativeScramble = (cumulativeScramble + " " + newMoves).trim();
+            await executeSequence(newMoves);
+            cumulativeScrambleDisplay.textContent = cumulativeScramble;
+            solutionText.innerHTML = `<p class="text-gray-500 solution-text">Cube scrambled. Ready to solve.</p>`;
+            saveScrambledState();
+            updateButtonStates('scrambled');
+        });
+        
+        randomScrambleBtn.addEventListener('click', () => {
+            if (appState !== 'idle' && appState !== 'scrambled') return;
+            const moves = ["U", "D", "L", "R", "F", "B"];
+            const modifiers = ["", "'", "2"];
+            let scramble = "";
+            let lastAxis = -1;
+            for(let i = 0; i < 20; i++){
+                let moveIdx, currentAxis;
+                do {
+                    moveIdx = Math.floor(Math.random() * moves.length);
+                    currentAxis = Math.floor(moveIdx / 2);
+                } while (currentAxis === lastAxis);
+                lastAxis = currentAxis;
+                scramble += moves[moveIdx] + modifiers[Math.floor(Math.random() * modifiers.length)] + " ";
+            }
+            scrambleInput.value = scramble.trim();
+        });
+        
+        solveBtn.addEventListener('click', async () => {
+            if (appState !== 'scrambled' || !cumulativeScramble) return;
+            updateButtonStates('solving');
+            statusMessage.textContent = 'Solving...';
+            try {
+                const normalizedScramble = cumulativeScramble.replace(/'2/g, '2');
+                const response = await fetch('/solve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scramble: normalizedScramble })
+                });
+                const data = await response.json();
+                if (data.solution) {
+                    solutionText.innerHTML = `<p class="text-green-600 font-bold solution-text">${data.solution}</p>`;
+                    updateButtonStates('solved');
+                    
+                    // MODIFIED: Create and show a temporary message box for solve time.
+                    const messageBox = document.createElement('div');
+                    messageBox.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-indigo-100 border border-indigo-400 text-indigo-700 px-4 py-3 rounded-lg shadow-xl z-50';
+                    messageBox.innerHTML = `Solution received in <strong>${data.time.toFixed(4)}</strong> seconds.`;
+                    document.body.appendChild(messageBox);
+                    setTimeout(() => {
+                        messageBox.remove();
+                    }, 4000);
+
+                } else {
+                    solutionText.innerHTML = `<p class="text-red-500 solution-text">${data.error || 'Failed to get solution.'}</p>`;
+                    updateButtonStates('scrambled');
+                }
+            } catch (error) {
+                solutionText.innerHTML = `<p class="text-red-500 solution-text">Error communicating with server.</p>`;
+                updateButtonStates('scrambled');
+            } finally {
+                statusMessage.textContent = '';
+            }
+        });
+        
+        playSolutionBtn.addEventListener('click', async () => {
+            if (appState !== 'solved') return;
+            updateButtonStates('playing');
+            statusMessage.textContent = 'Playing solution...';
+            
+            restoreScrambledState();
+
+            const solutionSequence = solutionText.textContent;
+            await executeSequence(solutionSequence);
+            statusMessage.textContent = 'Solution complete!';
+            setTimeout(() => statusMessage.textContent = '', 2000);
+            updateButtonStates('solved');
+        });
+
+        resetCubeBtn.addEventListener('click', () => {
+            if (['scrambling', 'solving', 'playing'].includes(appState)) return;
+            cubies.forEach(cubie => {
+                cubie.position.copy(cubie.userData.originalPosition);
+                cubie.quaternion.copy(cubie.userData.originalQuaternion);
+            });
+            setInitialView();
+            cumulativeScramble = "";
+            scrambleInput.value = '';
+            cumulativeScrambleDisplay.textContent = "";
+            solutionText.innerHTML = `<p class="text-gray-500 solution-text">Enter a scramble and click solve.</p>`;
+            statusMessage.innerHTML = '';
+            scrambledState = [];
+            updateButtonStates('idle');
+        });
+
+        updateButtonStates('idle');
+    </script>
+</body>
+</html>
