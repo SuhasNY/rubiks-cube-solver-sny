@@ -1,80 +1,87 @@
 # Python Rubik's Cube Solver
 
-> **Deployed Website URL:** [https://rubiks-cube-solver-sny.vercel.app/](https://rubiks-cube-solver-sny.vercel.app/)
+> **Deployed on Vercel:** [https://rubiks-cube-solver-sny.vercel.app/](https://rubiks-cube-solver-sny.vercel.app/)
 
-This project is a high-performance Rubik's Cube solver that uses Herbert Kociemba's two-phase algorithm to find near-optimal solutions, accessible via a command-line interface or a web UI.
-
----
-
-## Note for the Hackathon Evaluators:
-
-1. Please run `main.py` to observe the core functioning of the solver.
-2. Please run `TestCases.py` to observe pre-defined scrambles, and a demonstration of the solver and its performance for scrambles of various lengths.
-3. To observe the time taken to generate pruning and move tables (`cache.bin`), please delete the file locally and run `main.py` or `TestCases.py`.
-4. To use the solver integrated with the UI, please run the Flask app locally, or visit the URL of the deployed website elicited above.
-
-## Working: The Two-Phase Algorithm
-
-The solver is built around **Herbert Kociemba's two-phase algorithm**, a powerful method that dramatically reduces the search space required to find a solution. Instead of searching for a path from a scrambled state directly to the solved state, it searches for a path to an intermediate state, and then from there to the final solved state.
-
-* **Phase 1**: Gets the cube into a specific subgroup where all edge orientations are correct and all corners are in their correct slice. In this state, the cube can be solved using only a limited set of moves (`U`, `D`, `R2`, `L2`, `F2`, `B2`). This phase finds the shortest path to this intermediate state.
-
-* **Phase 2**: Finds the shortest path to the fully solved state using only the allowed moves.
-The algorithm's efficiency comes from using pre-calculated **pruning tables** and leveraging cube **symmetries**. These tables allow the search to "prune" branches that are guaranteed to not lead to an optimal solution within a certain number of moves, making the search feasible on modern hardware.
+This document describes a high-performance Rubik's Cube solver that uses Herbert Kociemba's two-phase algorithm. It is designed to find near-optimal solutions, typically in around **20 moves**, and is accessible via both a command-line interface and a web UI.
 
 ---
 
+## Note for Hackathon Evaluators
 
-### Prerequisites
-Before running, install the required Python packages from `requirements.txt`.
-```bash
-pip install -r requirements.txt
-```
+A note is included for the evaluators with guidance on how to test the project:
 
-### Generating the Solver Cache
-The first time you run the application, it will generate a `cache.bin` file containing the pruning tables. This can take a minute or two. On subsequent runs, the application will load this cache file for a much faster startup. If you delete `cache.bin`, it will be regenerated automatically.
+1.  It is suggested to run `main.py` to observe the core functionality of the solver.
+2.  Running `TestCases.py` will demonstrate the solver's performance on a variety of pre-defined scrambles.
+3.  To observe the time required to generate the pruning and move tables (`cache.bin`), the local file can be deleted before running `main.py` or `TestCases.py`.
+4.  The solver can be used with its UI by running the Flask app locally or by visiting the provided deployment URL.
+
+## Two-Phase Algorithm
+
+The solver's logic is based on an _IDA* (Iterative-Deepening A*) search_ built around **Herbert Kociemba's two-phase algorithm**. This method significantly reduces the search space by targeting an intermediate state before proceeding to the final solved state.
+
+* **Phase 1**: This phase aims to get the cube into a specific subgroup (G1). In this state, all edge orientations are correct, and all corner pieces are in their correct slice. This phase finds the shortest path to this intermediate G1 state.
+
+* **Phase 2**: A cube in the G1 state can be solved using a limited set of moves (`U`, `D`, `R2`, `L2`, `F2`, `B2`). This phase finds the shortest path from a G1 state to the fully solved state, using only the restricted move set, so as to preserve the solved pieces from phase 1.
+
+The algorithm's efficiency is enhanced by using pre-calculated **pruning tables** and leveraging cube **symmetries**. These tables enable the search to "prune" branches that are guaranteed to not lead to an optimal solution within a certain number of moves.
+
+---
+### Project Dependencies
+
+The project relies on the following Python libraries:
+1.  flask
+2.  bisect
+3.  random
+4.  struct
+5.  os
+6.  time
+
+### Solver Cache Generation
+On its first run, the application generates a `cache.bin` file, which contains the necessary pruning tables. This process takes 6-8 seconds. On subsequent runs, the application loads this cache file, which allows for a much faster startup. If the `cache.bin` file is deleted, it will be automatically regenerated on the next run.
 
 ### Running the Application
-You can run the project in three different ways:
+There are three runnable files, to focus on different elements of the project:
 
 1.  **Web Interface (Flask App):**
+    The Flask server can be started by running the following command:
     ```bash
     python app.py
     ```
-    Then, open your web browser and go to `http://127.0.0.1:5000`.
+    The web interface will then be accessible at `http://127.0.0.1:5000`.
 
 2.  **Interactive Command-Line Interface (CLI):**
+    The interactive CLI is launched with:
     ```bash
     python main.py
     ```
-    This will provide a menu to enter your own scrambles, input facelets, or generate random scrambles to solve.
+    This interface provides a CLI menu for entering custom scrambles, inputting facelets, or solving randomly generated scrambles.
 
 3.  **Run Predefined Test Cases:**
+    A series of predefined test cases can be run to demonstrate performance using:
     ```bash
     python TestCases.py
     ```
-    This script will solve a series of predefined scrambles to performance.
 
 ---
 
 ## Codebase Overview
 
-Here is a brief description of each file and its role in the project:
+What follows is a brief description of each file and its role in the project:
 
 #### Application Files
-* `app.py`: The **Flask web server** that provides the backend for the web UI. It handles `/solve` API requests.
-* `main.py`: The **interactive command-line interface** (CLI) for the solver.
-* `TestCases.py`: A script to run a set of predefined scramble tests to verify the solver's correctness.
-* `templates/index.html`: The single-page **frontend application** providing a 3D cube visualization and controls.
+* `app.py`: Contains the **Flask web server** that provides the backend for the web UI, handling API requests to the `/solve` endpoint.
+* `main.py`: Provides the **interactive command-line interface** (CLI) for using the solver.
+* `TestCases.py`: Runs a set of predefined scramble tests, to verify performance as well as demonstrate a range of scrambles and solutions.
+* `templates/index.html`: This file is the single-page **frontend application**, which provides a 3D cube visualization and user controls.
 
 #### Core Solver Logic
 * `solver.py`: Contains the core implementation of **Kociemba's two-phase search algorithm**.
-* `cubie_cube.py`: Defines the cube at the "cubie" level, representing the position and orientation of each of the 26 pieces.
+* `cubie_cube.py`: Defines the cube at the "cubie" level, modeling the position and orientation of each of the 26 pieces.
 * `coordinate_cube.py`: Maps the cubie-level representation to **coordinate representations**, which are used as indices for the pruning tables.
-* `cube_io_and_display.py`: Handles **I/O operations**, such as saving/loading the `cache.bin` file and formatting cube states for display.
-* `cube_utils.py`: A utility module containing **constants** (move definitions, facelet names, etc.) and helper functions used across the project.
+* `cube_io_and_display.py`: This module handles **I/O operations**, such as saving and loading the `cache.bin` file and formatting cube states for display.
+* `cube_utils.py`: Contains **constants** (like move definitions and facelet names) and helper functions used across the project.
 
 #### Configuration & Data
-* `cache.bin`: A binary file containing the **pre-computed pruning and move tables**. This is generated on the first run.
-* `requirements.txt`: Lists the **Python package dependencies** required for the project (e.g., Flask, Werkzeug).
-* `vercel.json`: The **configuration file** for deploying the Flask application to the Vercel platform.
+* `cache.bin`: Binary file that contains the **pre-computed pruning and move tables**. It is generated on the first run to speed up subsequent launches.
+* `requirements.txt`: Lists the **Python package dependencies** required to run the project.
+* `vercel.json`: The **configuration file** used for deploying the Flask application to the Vercel platform.
