@@ -10,7 +10,7 @@ class CubieCube:
     SYMMETRY_EDGE_TO_CORNER_MAGIC_NUMBER = 0x00DDDD00
 
 
-    CubeSym = [None] * 16
+    CUBE_SYMMETRIES = [None] * 16
     MOVE_CUBE_STATES = [None] * 18
     MOVE_CUBE_SYMMETRIES = [0] * 18
     FIRST_MOVE_SYMMETRIES = [0] * 48
@@ -92,7 +92,7 @@ class CubieCube:
         for i in range(16):
             sym_cube = CubieCube()
             sym_cube.copy(c)
-            CubieCube.CubeSym[i] = sym_cube
+            CubieCube.CUBE_SYMMETRIES[i] = sym_cube
             
             CubieCube.multiply_corners(c, u4, d)
             CubieCube.multiply_edges(c, u4, d)
@@ -109,9 +109,9 @@ class CubieCube:
 
         for i in range(16):
             for j in range(16):
-                CubieCube.multiply_corners(CubieCube.CubeSym[i], CubieCube.CubeSym[j], c)
+                CubieCube.multiply_corners(CubieCube.CUBE_SYMMETRIES[i], CubieCube.CUBE_SYMMETRIES[j], c)
                 for k in range(16):
-                    if c.corner_array == CubieCube.CubeSym[k].corner_array:
+                    if c.corner_array == CubieCube.CUBE_SYMMETRIES[k].corner_array:
                         CubieCube.SYMMETRY_MULTIPLICATION_TABLE[i][j] = k
                         CubieCube.SYMMETRY_MULTIPLICATION_INVERSE_TABLE[k][j] = i
                         break
@@ -397,8 +397,8 @@ class CubieCube:
 
     @staticmethod
     def conjugate_corners(a, idx, b):
-        sinv = CubieCube.CubeSym[CubieCube.SYMMETRY_MULTIPLICATION_INVERSE_TABLE[0][idx]]
-        s = CubieCube.CubeSym[idx]
+        sinv = CubieCube.CUBE_SYMMETRIES[CubieCube.SYMMETRY_MULTIPLICATION_INVERSE_TABLE[0][idx]]
+        s = CubieCube.CUBE_SYMMETRIES[idx]
         for corn in range(8):
             oriA = sinv.corner_array[a.corner_array[s.corner_array[corn] & 7] & 7] >> 3
             oriB = a.corner_array[s.corner_array[corn] & 7] >> 3
@@ -408,8 +408,8 @@ class CubieCube:
 
     @staticmethod
     def conjugate_edges(a, idx, b):
-        sinv = CubieCube.CubeSym[CubieCube.SYMMETRY_MULTIPLICATION_INVERSE_TABLE[0][idx]]
-        s = CubieCube.CubeSym[idx]
+        sinv = CubieCube.CUBE_SYMMETRIES[CubieCube.SYMMETRY_MULTIPLICATION_INVERSE_TABLE[0][idx]]
+        s = CubieCube.CUBE_SYMMETRIES[idx]
         for ed in range(12):
             b.edge_array[ed] = sinv.edge_array[a.edge_array[s.edge_array[ed] >> 1] >> 1] ^ (a.edge_array[s.edge_array[ed] >> 1] & 1) ^ (s.edge_array[ed] & 1)
 
