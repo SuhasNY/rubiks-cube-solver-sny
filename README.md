@@ -6,7 +6,7 @@ This document describes a high-performance Rubik's Cube solver that uses Herbert
 
 ---
 
-## Note for Hackathon Evaluators
+## Note for the Aero Hack 2025 Evaluators
 
 A note is included for the evaluators with guidance on how to test the project:
 
@@ -85,3 +85,4 @@ What follows is a brief description of each file and its role in the project:
 * `cache.bin`: Binary file that contains the **pre-computed pruning and move tables**. It is generated on the first run to speed up subsequent launches.
 * `requirements.txt`: Lists the **Python package dependencies** required to run the project.
 * `vercel.json`: The **configuration file** used for deploying the Flask application to the Vercel platform.
+
