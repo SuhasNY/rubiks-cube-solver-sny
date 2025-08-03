@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rubik's Cube Solver</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧊</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
@@ -123,7 +122,6 @@
     </div>
 
     <script type="module">
-        // --- Basic Setup ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
@@ -234,7 +232,6 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
         });
 
-        // --- State and Animation Logic ---
         let appState = 'idle';
         let cumulativeScramble = "";
         let scrambledState = [];
@@ -336,7 +333,7 @@
 
         function validateScramble(scrambleString) {
             if (!scrambleString.trim()) return true;
-            const validMoveRegex = /^[UDRLFB]('?2|'|2)?$/i; // Case-insensitive
+            const validMoveRegex = /^[UDRLFB]('?2|'|2)?$/i;
             const moves = scrambleString.trim().split(/\s+/);
             return moves.every(move => validMoveRegex.test(move));
         }
@@ -376,7 +373,6 @@
             if (appState !== 'idle' && appState !== 'scrambled') return;
             const newMoves = scrambleInput.value.trim().toUpperCase();
             if (!validateScramble(newMoves)) {
-                // MODIFIED: Display error message in bold.
                 statusMessage.innerHTML = "<strong>Invalid move found! Only use F, U, R, L, D, B with ' or 2.</strong>";
                 setTimeout(() => { if (statusMessage.innerHTML.includes("Invalid move")) statusMessage.innerHTML = ""; }, 3000);
                 return;
@@ -427,7 +423,6 @@
                     solutionText.innerHTML = `<p class="text-green-600 font-bold solution-text">${data.solution}</p>`;
                     updateButtonStates('solved');
                     
-                    // MODIFIED: Create and show a temporary message box for solve time.
                     const messageBox = document.createElement('div');
                     messageBox.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-indigo-100 border border-indigo-400 text-indigo-700 px-4 py-3 rounded-lg shadow-xl z-50';
                     messageBox.innerHTML = `Solution received in <strong>${data.time.toFixed(4)}</strong> seconds.`;
