@@ -8,16 +8,16 @@ This document describes a high-performance Rubik's Cube solver that uses Herbert
 
 ## Note for the Aero Hack 2025 Evaluators
 
-A note is included for the evaluators with guidance on how to test the project:
+Kindly follow these guidelines to observe the different components of this submission:
 
 1.  It is suggested to run `main.py` to observe the core functionality of the solver.
-2.  Running `TestCases.py` will demonstrate the solver's performance on a variety of pre-defined scrambles.
-3.  To observe the time required to generate the pruning and move tables (`cache.bin`), the local file can be deleted before running `main.py` or `TestCases.py`.
-4.  The solver can be used with its UI by running the Flask app locally or by visiting the provided deployment URL.
+2.  Running `TestCases.py` will demonstrate the solver's performance across a variety of pre-defined scrambles.
+3.  To observe the time required to generate the pruning and move tables (`cache.bin`), kindly delete said file before running `main.py` or `TestCases.py`.
+4.  The solver can be used with its UI by running the Flask app locally or by visiting the provided live webpage URL (deployed on Vercel).
 
 ## Two-Phase Algorithm
 
-The solver's logic is based on an _IDA* (Iterative-Deepening A*) search_ built around **Herbert Kociemba's two-phase algorithm**. This method significantly reduces the search space by targeting an intermediate state before proceeding to the final solved state.
+The solver's logic is based on an _IDA* (Iterative-Deepening A*) search_ built around **Herbert Kociemba's two-phase algorithm**. This method significantly reduces the search space by targeting an intermediate state before proceeding to the final solved state. The solution is obtained in at most **20 moves**.
 
 * **Phase 1**: This phase aims to get the cube into a specific subgroup (G1). In this state, all edge orientations are correct, and all corner pieces are in their correct slice. This phase finds the shortest path to this intermediate G1 state.
 
@@ -85,4 +85,5 @@ What follows is a brief description of each file and its role in the project:
 * `cache.bin`: Binary file that contains the **pre-computed pruning and move tables**. It is generated on the first run to speed up subsequent launches.
 * `requirements.txt`: Lists the **Python package dependencies** required to run the project.
 * `vercel.json`: The **configuration file** used for deploying the Flask application to the Vercel platform.
+
 
