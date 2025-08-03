@@ -39,7 +39,7 @@ class OutputWriter:
     def write(self, data):
         self.file.write(data)
 
-class Tools:
+class CubeTools:
 
     @staticmethod
     def read_char_array(arr, data_input):
@@ -54,12 +54,12 @@ class Tools:
     @staticmethod
     def read_char_matrix(arr, data_input):
         for i in range(len(arr)):
-            Tools.read_char_array(arr[i], data_input)
+            CubeTools.read_char_array(arr[i], data_input)
 
     @staticmethod
     def read_int_matrix(arr, data_input):
         for i in range(len(arr)):
-            Tools.read_int_array(arr[i], data_input)
+            CubeTools.read_int_array(arr[i], data_input)
     
     @staticmethod
     def write_char_array(arr, out):
@@ -74,15 +74,15 @@ class Tools:
     @staticmethod
     def write_char_2d_array(arr, out):
         for row in arr:
-            Tools.write_char_array(row, out)
+            CubeTools.write_char_array(row, out)
 
     @staticmethod
     def write_int_2d_array(arr, out):
         for row in arr:
-            Tools.write_int_array(row, out)
+            CubeTools.write_int_array(row, out)
     
     def __init__(self):
-        raise TypeError("Tools class should not be instantiated.")
+        raise TypeError("CubeTools class should not be instantiated.")
         
     @staticmethod
     def input_sanitizer(scramble_str: str) -> bool:
@@ -110,12 +110,12 @@ class Tools:
     @staticmethod
     def read_char_2d_array(arr, inp):
         for row in arr:
-            Tools.read_char_array(row, inp)
+            CubeTools.read_char_array(row, inp)
 
     @staticmethod
     def read_int_2d_array(arr, inp):
         for row in arr:
-            Tools.read_int_array(row, inp)
+            CubeTools.read_int_array(row, inp)
 
     @staticmethod
     def init_from(file_handle):
@@ -131,33 +131,33 @@ class Tools:
         file_content = file_handle.read()
         inp = InputReader(file_content)
 
-        Tools.read_char_array(CubieCube.FLIP_SYMMETRY_TO_RAW, inp)
-        Tools.read_char_array(CubieCube.TWIST_SYMMETRY_TO_RAW, inp)
-        Tools.read_char_array(CubieCube.EDGE_PERMUTATION_SYMMETRY_TO_RAW, inp)
+        CubeTools.read_char_array(CubieCube.FLIP_SYMMETRY_TO_RAW, inp)
+        CubeTools.read_char_array(CubieCube.TWIST_SYMMETRY_TO_RAW, inp)
+        CubeTools.read_char_array(CubieCube.EDGE_PERMUTATION_SYMMETRY_TO_RAW, inp)
         inp.read_fully(CubieCube.FLIP_RAW_TO_SYMMETRY)
         inp.read_fully(CubieCube.TWIST_RAW_TO_SYMMETRY)
         inp.read_fully(CubieCube.EDGE_PERMUTATION_RAW_TO_SYMMETRY)
-        Tools.read_char_array(CubieCube.PERMUTATION_TO_COMBINATION_PLUS_PARITY, inp) # Ensures PERMUTATION_TO_COMBINATION_PLUS_PARITY is read
-        Tools.read_char_array(CubieCube.PERMUTATION_INVERSE_EDGE_SYMMETRY, inp) # Ensures this is read as a char array
+        CubeTools.read_char_array(CubieCube.PERMUTATION_TO_COMBINATION_PLUS_PARITY, inp) # Ensures PERMUTATION_TO_COMBINATION_PLUS_PARITY is read
+        CubeTools.read_char_array(CubieCube.PERMUTATION_INVERSE_EDGE_SYMMETRY, inp) # Ensures this is read as a char array
 
         # CoordCube tables
-        Tools.read_char_2d_array(CoordCube.UD_SLICE_MOVE_TABLE, inp)
-        Tools.read_char_2d_array(CoordCube.TWIST_MOVE_TABLE, inp)
-        Tools.read_char_2d_array(CoordCube.FLIP_MOVE_TABLE, inp)
-        Tools.read_char_2d_array(CoordCube.UD_SLICE_CONJUGATION_TABLE, inp)
-        Tools.read_int_array(CoordCube.UD_SLICE_TWIST_PRUNING_TABLE, inp)
-        Tools.read_int_array(CoordCube.UDSliceFlipPrun, inp)
-        Tools.read_char_2d_array(CoordCube.CORNER_PERMUTATION_MOVE_TABLE, inp)
-        Tools.read_char_2d_array(CoordCube.EDGE_PERMUTATION_MOVE_TABLE, inp)
-        Tools.read_char_2d_array(CoordCube.MIDDLE_PERMUTATION_MOVE_TABLE, inp)
-        Tools.read_char_2d_array(CoordCube.MIDDLE_PERMUTATION_CONJUGATION_TABLE, inp)
-        Tools.read_char_2d_array(CoordCube.CORNER_COMBINATION_PLUS_PARITY_CONJUGATION_TABLE, inp)
-        Tools.read_int_array(CoordCube.MIDDLE_CORNER_PERMUTATION_PRUNING_TABLE, inp)
-        Tools.read_int_array(CoordCube.EDGE_PERMUTATION_CORNER_COMBINATION_PRUNING_TABLE, inp)
+        CubeTools.read_char_2d_array(CoordCube.UD_SLICE_MOVE_TABLE, inp)
+        CubeTools.read_char_2d_array(CoordCube.TWIST_MOVE_TABLE, inp)
+        CubeTools.read_char_2d_array(CoordCube.FLIP_MOVE_TABLE, inp)
+        CubeTools.read_char_2d_array(CoordCube.UD_SLICE_CONJUGATION_TABLE, inp)
+        CubeTools.read_int_array(CoordCube.UD_SLICE_TWIST_PRUNING_TABLE, inp)
+        CubeTools.read_int_array(CoordCube.UDSliceFlipPrun, inp)
+        CubeTools.read_char_2d_array(CoordCube.CORNER_PERMUTATION_MOVE_TABLE, inp)
+        CubeTools.read_char_2d_array(CoordCube.EDGE_PERMUTATION_MOVE_TABLE, inp)
+        CubeTools.read_char_2d_array(CoordCube.MIDDLE_PERMUTATION_MOVE_TABLE, inp)
+        CubeTools.read_char_2d_array(CoordCube.MIDDLE_PERMUTATION_CONJUGATION_TABLE, inp)
+        CubeTools.read_char_2d_array(CoordCube.CORNER_COMBINATION_PLUS_PARITY_CONJUGATION_TABLE, inp)
+        CubeTools.read_int_array(CoordCube.MIDDLE_CORNER_PERMUTATION_PRUNING_TABLE, inp)
+        CubeTools.read_int_array(CoordCube.EDGE_PERMUTATION_CORNER_COMBINATION_PRUNING_TABLE, inp)
 
         if CubeUtils.USE_TWIST_FLIP_PRUNING:
-            Tools.read_char_array(CubieCube.FLIP_SYMMETRY_TO_RAW_FLIPPED, inp)
-            Tools.read_int_array(CoordCube.TWIST_FLIP_PRUNING_TABLE, inp)
+            CubeTools.read_char_array(CubieCube.FLIP_SYMMETRY_TO_RAW_FLIPPED, inp)
+            CubeTools.read_int_array(CoordCube.TWIST_FLIP_PRUNING_TABLE, inp)
 
         Search.inited = True
         CoordCube.initialization_level = 2
@@ -173,33 +173,33 @@ class Tools:
         out = OutputWriter(file_handle)
 
         # Write CubieCube tables
-        Tools.write_char_array(CubieCube.FLIP_SYMMETRY_TO_RAW, out)
-        Tools.write_char_array(CubieCube.TWIST_SYMMETRY_TO_RAW, out)
-        Tools.write_char_array(CubieCube.EDGE_PERMUTATION_SYMMETRY_TO_RAW, out)
+        CubeTools.write_char_array(CubieCube.FLIP_SYMMETRY_TO_RAW, out)
+        CubeTools.write_char_array(CubieCube.TWIST_SYMMETRY_TO_RAW, out)
+        CubeTools.write_char_array(CubieCube.EDGE_PERMUTATION_SYMMETRY_TO_RAW, out)
         out.write(CubieCube.FLIP_RAW_TO_SYMMETRY)
         out.write(CubieCube.TWIST_RAW_TO_SYMMETRY)
         out.write(CubieCube.EDGE_PERMUTATION_RAW_TO_SYMMETRY)
-        Tools.write_char_array(CubieCube.PERMUTATION_TO_COMBINATION_PLUS_PARITY, out)
-        Tools.write_char_array(CubieCube.PERMUTATION_INVERSE_EDGE_SYMMETRY, out)
+        CubeTools.write_char_array(CubieCube.PERMUTATION_TO_COMBINATION_PLUS_PARITY, out)
+        CubeTools.write_char_array(CubieCube.PERMUTATION_INVERSE_EDGE_SYMMETRY, out)
         
         # Write CoordCube tables
-        Tools.write_char_2d_array(CoordCube.UD_SLICE_MOVE_TABLE, out)
-        Tools.write_char_2d_array(CoordCube.TWIST_MOVE_TABLE, out)
-        Tools.write_char_2d_array(CoordCube.FLIP_MOVE_TABLE, out)
-        Tools.write_char_2d_array(CoordCube.UD_SLICE_CONJUGATION_TABLE, out)
-        Tools.write_int_array(CoordCube.UD_SLICE_TWIST_PRUNING_TABLE, out)
-        Tools.write_int_array(CoordCube.UDSliceFlipPrun, out)
-        Tools.write_char_2d_array(CoordCube.CORNER_PERMUTATION_MOVE_TABLE, out)
-        Tools.write_char_2d_array(CoordCube.EDGE_PERMUTATION_MOVE_TABLE, out)
-        Tools.write_char_2d_array(CoordCube.MIDDLE_PERMUTATION_MOVE_TABLE, out)
-        Tools.write_char_2d_array(CoordCube.MIDDLE_PERMUTATION_CONJUGATION_TABLE, out)
-        Tools.write_char_2d_array(CoordCube.CORNER_COMBINATION_PLUS_PARITY_CONJUGATION_TABLE, out)
-        Tools.write_int_array(CoordCube.MIDDLE_CORNER_PERMUTATION_PRUNING_TABLE, out)
-        Tools.write_int_array(CoordCube.EDGE_PERMUTATION_CORNER_COMBINATION_PRUNING_TABLE, out)
+        CubeTools.write_char_2d_array(CoordCube.UD_SLICE_MOVE_TABLE, out)
+        CubeTools.write_char_2d_array(CoordCube.TWIST_MOVE_TABLE, out)
+        CubeTools.write_char_2d_array(CoordCube.FLIP_MOVE_TABLE, out)
+        CubeTools.write_char_2d_array(CoordCube.UD_SLICE_CONJUGATION_TABLE, out)
+        CubeTools.write_int_array(CoordCube.UD_SLICE_TWIST_PRUNING_TABLE, out)
+        CubeTools.write_int_array(CoordCube.UDSliceFlipPrun, out)
+        CubeTools.write_char_2d_array(CoordCube.CORNER_PERMUTATION_MOVE_TABLE, out)
+        CubeTools.write_char_2d_array(CoordCube.EDGE_PERMUTATION_MOVE_TABLE, out)
+        CubeTools.write_char_2d_array(CoordCube.MIDDLE_PERMUTATION_MOVE_TABLE, out)
+        CubeTools.write_char_2d_array(CoordCube.MIDDLE_PERMUTATION_CONJUGATION_TABLE, out)
+        CubeTools.write_char_2d_array(CoordCube.CORNER_COMBINATION_PLUS_PARITY_CONJUGATION_TABLE, out)
+        CubeTools.write_int_array(CoordCube.MIDDLE_CORNER_PERMUTATION_PRUNING_TABLE, out)
+        CubeTools.write_int_array(CoordCube.EDGE_PERMUTATION_CORNER_COMBINATION_PRUNING_TABLE, out)
 
         if CubeUtils.USE_TWIST_FLIP_PRUNING:
-            Tools.write_char_array(CubieCube.FLIP_SYMMETRY_TO_RAW_FLIPPED, out)
-            Tools.write_int_array(CoordCube.TWIST_FLIP_PRUNING_TABLE, out)
+            CubeTools.write_char_array(CubieCube.FLIP_SYMMETRY_TO_RAW_FLIPPED, out)
+            CubeTools.write_int_array(CoordCube.TWIST_FLIP_PRUNING_TABLE, out)
         
         print("Tables saved to cache.")
 
@@ -255,7 +255,7 @@ class Tools:
             arr[j] = axis
             j += 1
         ret = [arr[i] for i in range(j)]
-        return Tools.from_scramble_array(ret)
+        return CubeTools.from_scramble_array(ret)
     
     @staticmethod
     def random_scramble_generator(length=20):
