@@ -1,7 +1,7 @@
 import os
 import time
 from solver import Search
-from cube_io_and_display import Tools
+from cube_io_and_display import CubeTools
 
 def main():
     try:
@@ -12,11 +12,11 @@ def main():
 
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, 'rb') as f:
-            Tools.init_from(f)
+            CubeTools.init_from(f)
     else:
         with open(CACHE_FILE, 'wb') as f:
             start_time = time.time()
-            Tools.save_to(f)
+            CubeTools.save_to(f)
             end_time = time.time()
             print(f"\nGenerated tables in {end_time - start_time :.4f} seconds\n")
 
@@ -35,8 +35,8 @@ def main():
         if choice == 's':
             while True:
                 scramble = input("Enter scramble (e.g., F U' R2 ...): ")
-                if Tools.input_sanitizer(scramble):
-                    facelets = Tools.from_scramble_string(scramble)
+                if CubeTools.input_sanitizer(scramble):
+                    facelets = CubeTools.from_scramble_string(scramble)
                     break
                 else:
                     print("Invalid input. Please use valid moves (U, D, L, R, F, B with ' or 2), separated by spaces.")
@@ -67,16 +67,16 @@ def main():
                     print(f"Error: Invalid character {e} found. Please use only W, R, G, Y, O, B.")
 
         elif choice == 'r':
-            scramble = Tools.random_scramble_generator()
+            scramble = CubeTools.random_scramble_generator()
             print(f"\nGenerated Scramble: {scramble}")
-            facelets = Tools.from_scramble_string(scramble)
+            facelets = CubeTools.from_scramble_string(scramble)
                     
         else:
             print("Invalid choice. Please try again.")
             continue
 
         if facelets:
-            Tools.print_facelets_2d(facelets)
+            CubeTools.print_facelets_2d(facelets)
 
             search = Search()
             
