@@ -140,7 +140,7 @@ class Search:
             self.allow_shorter_phase1 = (self.current_phase1_depth == self.MIN_PHASE1_LENGTH_AFTER_PREMOVES and self.pre_move_sequence_length != 0)
 
             if self.phase1_nodes[self.current_phase1_depth + 1].set_coordinates_with_pruning(cc, self.current_phase1_depth) and \
-                self.phase1(self.phase1_nodes[self.current_phase1_depth + 1], ssym, self.current_phase1_depth, -1) == 0: #<- FIX
+                self.phase1(self.phase1_nodes[self.current_phase1_depth + 1], ssym, self.current_phase1_depth, -1) == 0:
                 return 0
 
         if maxl == 0 or self.pre_move_sequence_length + self.MIN_PHASE1_LENGTH_AFTER_PREMOVES >= self.phase1_length:
@@ -255,7 +255,7 @@ class Search:
             return 2 if prun > self.max_phase2_depth_allowed else 1
 
         for depth2 in range(self.max_phase2_depth_allowed - 1, prun - 1, -1):
-            ret = self.phase2(p2edge, p2esym, p2corn, p2csym, p2mid, depth2, self.current_phase1_depth, 10) #<- FIX
+            ret = self.phase2(p2edge, p2esym, p2corn, p2csym, p2mid, depth2, self.current_phase1_depth, 10)
             if ret < 0:
                 break
 
@@ -356,11 +356,10 @@ class Search:
         m = 0
         while m < 10:
             if (move_mask >> m) & 1 != 0:
-                m += (0x42 >> m) & 3  # Jump to the next valid axis.
-                m += 1               # The for-loop's own increment.
+                m += (0x42 >> m) & 3
+                m += 1
                 continue
 
-            # --- Apply move and calculate next coordinates ---
             midx = CoordCube.MIDDLE_PERMUTATION_MOVE_TABLE[mid][m]
             cornx = CoordCube.CORNER_PERMUTATION_MOVE_TABLE[corn][CubieCube.SYMMETRY_UP_DOWN_MOVE_TABLE[csym][m]]
             csymx = CubieCube.SYMMETRY_MULTIPLICATION_TABLE[cornx & 0xf][csym]
@@ -372,14 +371,13 @@ class Search:
             edgei = CubieCube.get_inverse_permutation_symmetry(edgex, esymx, False)
             corni = CubieCube.get_inverse_permutation_symmetry(cornx, csymx, True)
 
-            # --- Pruning Check 1 ---
             prun = CoordCube.get_pruning_table_value(
                 CoordCube.EDGE_PERMUTATION_CORNER_COMBINATION_PRUNING_TABLE,
                 (edgei >> 4) * CoordCube.N_COMB + CoordCube.CORNER_COMBINATION_PLUS_PARITY_CONJUGATION_TABLE[CubieCube.PERMUTATION_TO_COMBINATION_PLUS_PARITY[corni >> 4] & 0xff][CubieCube.SYMMETRY_MULTIPLICATION_INVERSE_TABLE[edgei & 0xf][corni & 0xf]]
             )
             if prun >= maxl:
-                m += ((0x42 >> m) & 3) & (maxl - prun)  # Perform heuristic jump.
-                m += 1                                # The for-loop's own increment.
+                m += ((0x42 >> m) & 3) & (maxl - prun)
+                m += 1
                 continue
 
             # --- Pruning Check 2 ---
@@ -388,17 +386,15 @@ class Search:
                 CoordCube.get_pruning_table_value(CoordCube.EDGE_PERMUTATION_CORNER_COMBINATION_PRUNING_TABLE, edgex * CoordCube.N_COMB + CoordCube.CORNER_COMBINATION_PLUS_PARITY_CONJUGATION_TABLE[CubieCube.PERMUTATION_TO_COMBINATION_PLUS_PARITY[cornx] & 0xff][CubieCube.SYMMETRY_MULTIPLICATION_INVERSE_TABLE[esymx][csymx]])
             )
             if prun >= maxl:
-                m += ((0x42 >> m) & 3) & (maxl - prun)  # Perform heuristic jump.
-                m += 1                                # The for-loop's own increment.
+                m += ((0x42 >> m) & 3) & (maxl - prun)
+                m += 1
                 continue
                 
-            # --- Recursive Call ---
             ret = self.phase2(edgex, esymx, cornx, csymx, midx, maxl - 1, depth + 1, m)
             if ret >= 0:
                 self.move[depth] = CubeUtils.UP_DOWN_TO_STANDARD_MOVE_MAP[m]
                 return ret
             
-            # --- Standard Increment ---
             m += 1
             
         return -1
@@ -420,7 +416,6 @@ class Search:
                 if (self.verbosity_level & self.USE_SEPARATOR) != 0 and s == self.current_phase1_depth:
                     sb.append(".  ")
         
-        # 4. Remove the trailing comma for neatness
         moves_str = ''.join(sb).strip()
         if moves_str.endswith(','):
             moves_str = moves_str[:-1]
