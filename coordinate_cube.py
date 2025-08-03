@@ -59,9 +59,7 @@ class CoordCube:
     @staticmethod
     def set_pruning_table_value_table_value_byte(table: bytearray, index: int, value: int):
         shift = (index & 1) << 2
-        # First, clear the 4 bits at the target location to zero
         table[index >> 1] &= ~(0xF << shift)
-        # Then, set the new value in that cleared location
         table[index >> 1] |= (value << shift)
 
     @staticmethod
