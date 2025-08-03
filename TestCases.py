@@ -3,7 +3,7 @@
 import os
 import time
 from solver import Search
-from cube_io_and_display import Tools
+from cube_io_and_display import CubeTools
 
 def run_tests():
     """
@@ -17,11 +17,11 @@ def run_tests():
     if os.path.exists(CACHE_FILE):
         print(f"Loading tables from '{CACHE_FILE}'...")
         with open(CACHE_FILE, 'rb') as f:
-            Tools.init_from(f)
+            CubeTools.init_from(f)
     else:
         print(f"Cache file '{CACHE_FILE}' not found.")
         with open(CACHE_FILE, 'wb') as f:
-            Tools.save_to(f)
+            CubeTools.save_to(f)
             
     init_duration = time.time() - init_start_time
     print(f"--- Initialization Complete ({init_duration:.2f}s) ---\n")
@@ -53,7 +53,7 @@ def run_tests():
     for i, scramble in enumerate(scrambles):
         print(f"--- Test Case {i+1}: Scramble `{scramble}` ---")
         
-        facelets = Tools.from_scramble_string(scramble)
+        facelets = CubeTools.from_scramble_string(scramble)
         print(f"Facelets: {facelets}")
 
         solve_start_time = time.time()
